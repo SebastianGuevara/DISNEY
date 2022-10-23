@@ -1,37 +1,87 @@
-import React from 'react'
+import React, {useEffect} from 'react'
 import styled from 'styled-components'
+import { selectUserName, selectUserPhoto, setUserLogin, setSignOut } from '../features/user/userSlice'
+import { useSelector, useDispatch } from 'react-redux'
+import { auth, provider } from '../firebase'
+import { useHistory } from 'react-router-dom'
+
 
 function Headera() {
+    const dispatch = useDispatch();
+    const history = useHistory();
+    const userName = useSelector(selectUserName);
+    const userPhoto = useSelector(selectUserPhoto);
+
+    useEffect(() => {
+        auth.onAuthStateChanged(async (user)=>{
+            if(user){dispatch(setUserLogin({
+                name: user.displayName,
+                email: user.email,
+                photo: user.photoURL
+            }))
+            
+            }
+        })
+
+    }, [])
+
+    console.log(userPhoto)
+
+    const signIn = () => {
+        auth.signInWithPopup(provider)
+        .then((result)=>dispatch(setUserLogin({
+            name: result.user.user.displayName,
+            email: result.user.user.email,
+            photo: result.user.user.photoURL
+        })),
+        history.push("/"))
+    }
+
+    const signOut = () => {
+        auth.signOut().then(() => {
+            dispatch(setSignOut());
+            history.push("/login");
+        })
+    }
+
   return (
     <Nav>
         <Logo src="\images\logo.svg"/>
-        <NavMenu>
-                <a>
-                    <img src="/images/home-icon.svg"/>
-                    <span>HOME</span>
-                </a>
-                <a>
-                    <img src="/images/search-icon.svg"/>
-                    <span>SEARCH</span>
-                </a>
-                <a>
-                    <img src="/images/watchlist-icon.svg"/>
-                    <span>WATCHLIST</span>
-                </a>
-                <a>
-                    <img src="/images/original-icon.svg"/>
-                    <span>ORIGINALS</span>
-                </a>
-                <a>
-                    <img src="/images/movie-icon.svg"/>
-                    <span>MOVIES</span>
-                </a>
-                <a>
-                    <img src="/images/series-icon.svg"/>
-                    <span>SERIES</span>
-                </a>
-        </NavMenu>
-        <UserImg src="https://www.egames.news/__export/1659196697802/sites/debate/img/2022/07/30/riot_games_revela_que_el_nerf_de_chamber_estx_siendo_probado_en_valorant.jpg_976912859.jpg"/>
+        { !userName?
+            <LoginContainer>
+                <Login onClick={signIn}>Login</Login>
+            </LoginContainer>:
+            <>
+                <NavMenu>
+                    <a>
+                        <img src="/images/home-icon.svg"/>
+                        <span>HOME</span>
+                    </a>
+                    <a>
+                        <img src="/images/search-icon.svg"/>
+                        <span>SEARCH</span>
+                    </a>
+                    <a>
+                        <img src="/images/watchlist-icon.svg"/>
+                        <span>WATCHLIST</span>
+                    </a>
+                    <a>
+                        <img src="/images/original-icon.svg"/>
+                        <span>ORIGINALS</span>
+                    </a>
+                    <a>
+                        <img src="/images/movie-icon.svg"/>
+                        <span>MOVIES</span>
+                    </a>
+                    <a>
+                        <img src="/images/series-icon.svg"/>
+                        <span>SERIES</span>
+                    </a>
+                </NavMenu>
+                <UserImg onClick={signOut} src={userPhoto}/>  
+            </>
+        }
+        
     </Nav>
   )
 }
@@ -98,4 +148,28 @@ const UserImg = styled.img`
     width: 48px;
     height: 48px;
     border-radius: 50%;
+    cursor: pointer;
+`
+
+const Login = styled.div`
+    border: 1px solid #f9f9f9;
+    padding: 8px 16px;
+    border-radius: 4px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    background-color: rgba(0,0,0,0.6);
+    transition: all 0.2s ease 0s;
+    cursor: pointer;
+
+    &:hover{
+        background-color: #f9f9f9;
+        color: #000;
+        border-color: transparent;
+    }
+`
+
+const LoginContainer = styled.div`
+    flex:1;
+    display: flex;
+    justify-content: flex-end;
 `
