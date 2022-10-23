@@ -4,6 +4,7 @@ import { selectUserName, selectUserPhoto, setUserLogin, setSignOut } from '../fe
 import { useSelector, useDispatch } from 'react-redux'
 import { auth, provider } from '../firebase'
 import { useHistory } from 'react-router-dom'
+import { Link } from 'react-router-dom'
 
 
 function Headera() {
@@ -53,10 +54,12 @@ function Headera() {
             </LoginContainer>:
             <>
                 <NavMenu>
+                    <Link to={'/'}>
                     <a>
                         <img src="/images/home-icon.svg"/>
                         <span>HOME</span>
                     </a>
+                    </Link>
                     <a>
                         <img src="/images/search-icon.svg"/>
                         <span>SEARCH</span>
@@ -111,6 +114,7 @@ const NavMenu = styled.div`
         display: flex;
         align-items: center;
         padding: 0 12px;
+        color: white;
 
         img{
             height: 20px;
@@ -137,11 +141,15 @@ const NavMenu = styled.div`
         }
 
         &:hover{
+            text-decoration: none;
             span:after{
                 transform: scaleX(1);
                 opacity:1;
             }
         }
+        &:hover { text-decoration: none; }
+        &:active { text-decoration: none; }
+        &:link { text-decoration: none; }
     }
 `
 const UserImg = styled.img`
